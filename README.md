@@ -12,4 +12,5 @@ Made this python script for my own personal use so it's currently quite bare and
 ##TODO
 - Multiple Lang support
 - Get actual UA from opensubtitles
+- Search via movie name
 - GUI?
