@@ -13,14 +13,14 @@ HTTP_OK = '200'
 def main():
     print('WELCOME TO THE SUBTITLE DOWNLOADER')
     filePath = (raw_input('Please input the movie/tv show file path: ')).strip()
+    filePath = filePath.replace('\\', '')
     hashed = hashFile(filePath)
     xmlrpc = ServerProxy(OS_SERVER,allow_none=True)
     data = attemptConnection(xmlrpc)
     
     result = xmlrpc.SearchSubtitles(data.get('token'),[{'sublanguageid':'eng','moviehash': hashed, 
                                                         'moviebytesize': os.path.getsize(filePath)}])
-    lastIndex = filePath.rfind('/')
-    fileDestination = filePath[0:lastIndex+1]
+    fileDestination = os.path.dirname(filePath)
     
     
     print("There are " + str(len(result.get('data'))) + " available subtitles.")
