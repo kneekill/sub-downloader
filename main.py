@@ -14,6 +14,8 @@ def main():
     print('WELCOME TO THE SUBTITLE DOWNLOADER')
     filePath = (raw_input('Please input the movie/tv show file path: ')).strip()
     filePath = filePath.replace('\\', '')
+    if(os.name == 'nt'):
+        filePath = filePath.replace('"', '')
     hashed = hashFile(filePath)
     xmlrpc = ServerProxy(OS_SERVER,allow_none=True)
     data = attemptConnection(xmlrpc)
@@ -29,7 +31,7 @@ def main():
     while(not index.isdigit()):
         index = raw_input('Please input a valid integer for the index:')
     index = int(index)
-    while(index > len(result.get('data')) or index < 0):
+    while(index > (len(result.get('data'))-1) or index < 0):
         index = int(raw_input('Index is invalid! Please input a valid index: '))
     
     #downloading and renaming sub
