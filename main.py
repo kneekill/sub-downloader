@@ -23,17 +23,23 @@ def main():
     result = xmlrpc.SearchSubtitles(data.get('token'),[{'sublanguageid':'eng','moviehash': hashed, 
                                                         'moviebytesize': os.path.getsize(filePath)}])
     fileDestination = os.path.dirname(filePath)
+    if(result.get('status') == '503 Service Unavailable'):
+        print("OpenSubtitles' server seems to be down, please try again later.")
+        sys.exit()
     
-    
-    print("There are " + str(len(result.get('data'))) + " available subtitles.")
-    index = raw_input('Please input the index(starting at 0) of subtitles you want to download: ')
-    #input validation
-    while(not index.isdigit()):
-        index = raw_input('Please input a valid integer for the index:')
-    index = int(index)
-    while(index > (len(result.get('data'))-1) or index < 0):
-        index = int(raw_input('Index is invalid! Please input a valid index: '))
-    
+    number_of_subs = len(result.get('data'))
+    if(number_of_subs == 0):
+        print("Sorry no subtitles are available!")
+        sys.exit()
+    print("There are " + str(len(number_of_subs)) + " available subtitles.")
+    if(number_of_subs != 1):
+        index = raw_input('Please input the index(starting at 0) of subtitles you want to download: ')
+        #input validation
+        while(not index.isdigit()):
+            index = raw_input('Please input a valid integer for the index:')
+        index = int(index)
+        while(index > (len(result.get('data'))-1) or index < 0):
+            index = int(raw_input('Index is invalid! Please input a valid index: '))
     #downloading and renaming sub
     urllib.URLopener().retrieve(result.get('data')[index].get('SubDownloadLink'), fileDestination + 'sub.gz')
     f = gzip.open(fileDestination + 'sub.gz', 'rb')
