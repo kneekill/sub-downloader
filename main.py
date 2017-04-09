@@ -11,6 +11,7 @@ OS_UA = 'OSTestUserAgentTemp'
 HTTP_OK = '200'
 HTTP_SERVICE_UNAVAILABLE = '503'
 
+
 def main():
     print 'WELCOME TO THE SUBTITLE DOWNLOADER'
     file_path = (raw_input('Please input the movie/tv show file path: ')).strip()
@@ -20,10 +21,10 @@ def main():
     hashed = hashFile(file_path)
     xmlrpc = ServerProxy(OS_SERVER, allow_none=True)
     data = attemptConnection(xmlrpc)
-    result = xmlrpc.SearchSubtitles(data.get('token'), [{'sublanguageid':'eng', 'moviehash': hashed,
-                                                         'moviebytesize':os.path.getsize(file_path)}])
+    result = xmlrpc.SearchSubtitles(data.get('token'), [{'sublanguageid': 'eng', 'moviehash': hashed,
+                                                         'moviebytesize': os.path.getsize(file_path)}])
     file_destination = os.path.dirname(file_path)
-    if result.get('status').split()[0] == HTTP_SERVICE_UNAVAILABLE:
+    if result.get('status').split()[0] == str(HTTP_SERVICE_UNAVAILABLE):
         print "OpenSubtitles' server seems to be down, please try again later."
         sys.exit()
 
@@ -34,13 +35,13 @@ def main():
     print "There are " + str(len(number_of_subs)) + " available subtitles."
     if number_of_subs != 1:
         index = raw_input('Please input the index(starting at 0) of subtitles you want to download: ')
-        #input validation
+        # input validation
         while not index.isdigit():
             index = raw_input('Please input a valid integer for the index:')
         index = int(index)
         while index > (len(result.get('data'))-1) or index < 0:
             index = int(raw_input('Index is invalid! Please input a valid index: '))
-    #downloading and renaming sub
+    # downloading and renaming sub
     urllib.URLopener().retrieve(result.get('data')[index].get('SubDownloadLink'),
                                 file_destination + 'sub.gz')
     sub_file = gzip.open(file_destination + 'sub.gz', 'rb')
@@ -53,6 +54,7 @@ def main():
     out.close()
     os.remove(file_destination + 'sub.gz')
     print 'Subtitles downloaded!'
+
 
 # hash function from: http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes
 def hashFile(name):
@@ -75,7 +77,6 @@ def hashFile(name):
             (l_value,) = struct.unpack(longlongformat, buffer)
             hash += l_value
             hash = hash & 0xFFFFFFFFFFFFFFFF
-                 
         f.close()
         returnedhash = "%016x" % hash
         return returnedhash
