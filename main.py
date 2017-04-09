@@ -7,13 +7,13 @@ import gzip
 from time import sleep
 
 OS_SERVER = 'http://api.opensubtitles.org/xml-rpc'
-OS_UA = 'OSTestUserAgentTemp'
+OS_UA = 'sub-downloader'
 HTTP_OK = '200'
 HTTP_SERVICE_UNAVAILABLE = '503'
 
 
 def main():
-    print 'WELCOME TO THE SUBTITLE DOWNLOADER'
+    print ('WELCOME TO THE SUBTITLE DOWNLOADER')
     file_path = (raw_input('Please input the movie/tv show file path: ')).strip()
     file_path = file_path.replace('\\', '')
     if os.name == 'nt':
@@ -24,15 +24,17 @@ def main():
     result = xmlrpc.SearchSubtitles(data.get('token'), [{'sublanguageid': 'eng', 'moviehash': hashed,
                                                          'moviebytesize': os.path.getsize(file_path)}])
     file_destination = os.path.dirname(file_path)
-    if result.get('status').split()[0] == str(HTTP_SERVICE_UNAVAILABLE):
-        print "OpenSubtitles' server seems to be down, please try again later."
+    print(result)
+    if result.get('status').split()[0] == HTTP_SERVICE_UNAVAILABLE:
+        print ("OpenSubtitles' server seems to be down, please try again later.")
         sys.exit()
 
     number_of_subs = len(result.get('data'))
     if number_of_subs == 0:
-        print "Sorry no subtitles are available!"
+        print ("Sorry no subtitles are available!")
         sys.exit()
-    print "There are " + str(len(number_of_subs)) + " available subtitles."
+    print ("There are " + str(number_of_subs) + " available subtitles.")
+    index = 0
     if number_of_subs != 1:
         index = raw_input('Please input the index(starting at 0) of subtitles you want to download: ')
         # input validation
@@ -53,7 +55,7 @@ def main():
     out.write(file_content)
     out.close()
     os.remove(file_destination + 'sub.gz')
-    print 'Subtitles downloaded!'
+    print ('Subtitles downloaded!')
 
 
 # hash function from: http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes
@@ -89,13 +91,14 @@ def attemptConnection(xmlrpc):
     data = xmlrpc.LogIn('', '', 'en', OS_UA)
     retry_counter = 0
     while data.get('status').split()[0] != HTTP_OK and retry_counter < 3:
-        print 'Connection refused,  HTTP Code: ' + data.get('status').split()[0]
-        print 'Retrying!'
+        print(data)
+        print ('Connection refused,  HTTP Code: ' + data.get('status').split()[0])
+        print ('Retrying!')
         sleep(5)
         data = xmlrpc.LogIn('', '', 'en', OS_UA)
         retry_counter += 1
     if retry_counter == 3:
-        print 'Failed to connect'
+        print ('Failed to connect')
         sys.exit()
     return data
 
