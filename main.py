@@ -24,7 +24,6 @@ def main():
     result = xmlrpc.SearchSubtitles(data.get('token'), [{'sublanguageid': 'eng', 'moviehash': hashed,
                                                          'moviebytesize': os.path.getsize(file_path)}])
     file_destination = os.path.dirname(file_path)
-    print(result)
     if result.get('status').split()[0] == HTTP_SERVICE_UNAVAILABLE:
         print ("OpenSubtitles' server seems to be down, please try again later.")
         sys.exit()
